@@ -1,0 +1,35 @@
+version: "3.3"
+
+services:
+  mauto:
+    build: .
+    image: mauto-platform:latest
+    container_name: mauto-platform
+    restart: unless-stopped
+    environment:
+      MAUTO_ENV: production
+      MAUTO_HOST: 0.0.0.0
+      MAUTO_PORT: "8000"
+      MAUTO_DATA_DIR: /app/data
+      MAUTO_BASE_URL: "${MAUTO_BASE_URL:-https://mauto.com}"
+      MAUTO_WORKERS: "${MAUTO_WORKERS:-2}"
+      MAUTO_CORS_ORIGINS: "${MAUTO_CORS_ORIGINS:-}"
+      MAUTO_ALLOWED_HOSTS: "${MAUTO_ALLOWED_HOSTS:-*}"
+      MAUTO_COOKIE_SECURE: "${MAUTO_COOKIE_SECURE:-true}"
+      MAUTO_STATIC_CACHE_SECONDS: "${MAUTO_STATIC_CACHE_SECONDS:-86400}"
+      MAUTO_LLM_API_KEY: "${MAUTO_LLM_API_KEY:-}"
+      MAUTO_LLM_BASE_URL: "${MAUTO_LLM_BASE_URL:-https://api.openai.com/v1}"
+      MAUTO_LLM_MODEL: "${MAUTO_LLM_MODEL:-gpt-4o-mini}"
+    ports:
+      # 默认只暴露给本机反向代理（Nginx / Caddy）；直接对外可改为 "8000:8000"
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - mauto-data:/app/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  mauto-data:
